@@ -194,11 +194,11 @@ class WC_Gateway_ScotiaHPP extends WC_Payment_Gateway {
 
 
   public function process_payment($order_id) {
-    error_log("[ScotiaHPP] process_payment started for order ID: $order_id");
+    
 
     $order = wc_get_order($order_id);
     if (! $order) {
-        error_log("[ScotiaHPP] Invalid order.");
+    
         wc_add_notice(__('Invalid order. Please try again.', 'scotia-hpp-woo'), 'error');
         return ['result' => 'failure'];
     }
@@ -208,19 +208,19 @@ class WC_Gateway_ScotiaHPP extends WC_Payment_Gateway {
 
     if ($sandbox_mode && strtoupper($currency) !== 'USD') {
         wc_add_notice(__('In sandbox mode, only USD is allowed for ScotiaBank HPP.', 'scotia-hpp-woo'), 'error');
-        error_log("[ScotiaHPP] Sandbox mode active but currency is not USD: $currency");
+        
         return ['result' => 'failure'];
     }
 
     if (! $sandbox_mode && strtoupper($currency) !== 'TTD') {
         wc_add_notice(__('In live mode, only TTD is allowed for ScotiaBank HPP.', 'scotia-hpp-woo'), 'error');
-        error_log("[ScotiaHPP] Live mode active but currency is not TTD: $currency");
+        
         return ['result' => 'failure'];
     }
 
     $redirect_url = add_query_arg('scotiahpp_redirect', $order_id, home_url());
 
-    error_log("[ScotiaHPP] Redirecting customer to: $redirect_url");
+   
 
     return [
         'result' => 'success',
@@ -229,16 +229,16 @@ class WC_Gateway_ScotiaHPP extends WC_Payment_Gateway {
 }
 
     private function create_scotiahpp_url($order) {
-         error_log("[ScotiaHPP] create_scotiahpp_url started");
+        
     $sandbox_mode = $this->get_option('sandbox_mode') === 'yes';
 
-    error_log("[ScotiaHPP] Sandbox Mode: " . ($sandbox_mode ? 'YES' : 'NO'));
+    
 
     $store_id = $sandbox_mode ? $this->get_option('test_store_id') : $this->get_option('prod_store_id');
     $shared_secret = $sandbox_mode ? $this->get_option('test_shared_secret') : $this->get_option('prod_shared_secret');
 
     if (empty($store_id) || empty($shared_secret)) {
-        error_log("[ScotiaHPP] Missing credentials. store_id: $store_id, secret: " . ($shared_secret ? 'SET' : 'EMPTY'));
+        
         return false;
     }
 
@@ -312,12 +312,12 @@ $response_fail_url = add_query_arg(
         ]);
     }
 
-    error_log("[ScotiaHPP] String to hash: $string_to_hash");
+ 
 
 
     $hash = base64_encode(hash_hmac('sha256', $string_to_hash, $shared_secret, true));
 
-    error_log("[ScotiaHPP] Hash generated");
+    
     $action_url = $sandbox_mode
         ? 'https://test.ipg-online.com/connect/gateway/processing'
         : 'https://www2.ipg-online.com/connect/gateway/processing';
@@ -349,8 +349,7 @@ $response_fail_url = add_query_arg(
         $form_fields .= sprintf('<input type="hidden" name="%s" value="%s" />', esc_attr($key), esc_attr($value));
     }
 
-    error_log("[ScotiaHPP] Raw Form:\n<form method='post' action='{$action_url}'>\n" . $form_fields . "\n</form>");
-error_log("[ScotiaHPP] Returning redirect form to IPG");
+    
     return 'data:text/html,' . rawurlencode("
         <!DOCTYPE HTML>
         <html>
