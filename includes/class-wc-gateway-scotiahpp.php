@@ -404,5 +404,11 @@ public function handle_scotiahpp_redirect( $order_id ) {
     $order->save();
 }
 
+	public function email_instructions( $order, $sent_to_admin, $plain_text = false ) {
+		if ( $this->instructions && ! $sent_to_admin && $this->id === $order->get_payment_method() ) {
+			echo wp_kses_post( wpautop( wptexturize( $this->instructions ) ) . PHP_EOL );
+		}
+	}
+
 
 }
